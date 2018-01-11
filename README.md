@@ -4,17 +4,17 @@ Docker image to backup [TargetProcess](https://www.targetprocess.com) entities.
 
 ## Specification
 This project builds a docker image which is responsible for backing up
- TargetProcess entities like: user stories, features, attachments, etc.
-  The entities are saved into `.json` files, attachments are downloaded.
+ TargetProcess entities like: User Stories, Features, Attachments, etc.
+  The entities are saved into `.json` files, Attachments are downloaded.
 
 It uses TargetProcess [REST API](https://md5.tpondemand.com/api/v1/index/meta).
 
 ### Backup directory structure
-Backup will be done into `/tmp/tp_backup/full`.
+Backup files will be save into directory `/tmp/tp_backup/full`.
 ```
 /tmp/tp_backup/full/
   attachments/
-    my_attachment1.png          # here goes real name of your attachment
+    my_attachment1.png
     my_attachment2.txt
   assignments_1_901.json        # metadata about attachments
   assignments_902_1802.json
@@ -36,6 +36,13 @@ For each entity type which is backuped, there is a javascript file in `./entitie
 Dashboards are not backuped. But they are made of views, reports and groups (directories), which are backuped.
 
 ## Usage
+This is a short-running image, it will stop after its job is done.
+Results will be saved to: `/tmp/tp_backup/full`.
+
+There are 2 possibilities to run it.
+
+
+### Credentials as environment variables
 Choose some user who is a TargetProcess Admin and then pass its credentials
  either as environment variables:
 ```
@@ -45,7 +52,9 @@ docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup\
   xmik/targetprocess-backup
 ```
 
-or write them to a local file: `/tmp/tp_backup/credentials.sh`. E.g.
+### Credentials from file
+Choose some user who is a TargetProcess Admin and then write its credentials
+to a local file which will be accessible in the docker container as: `/tmp/tp_backup/credentials.sh`. E.g.
 ```
 #!/bin/bash
 
@@ -57,8 +66,6 @@ and then run the container:
 ```
 docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup xmik/targetprocess-backup
 ```
-
-This is a short-running image, it will stop after its job is done.
 
 ### Usage - test
 If you want to just try this docker image out or verify if you have set up

@@ -12,8 +12,8 @@ fi
 # paths to other scripts
 cd "${BASH_SOURCE%/*}" || exit
 
-if [ -f "./credentials.sh" ]; then
-  source "./credentials.sh"
+if [ -f "/tmp/tp_backup/credentials.sh" ]; then
+  source "/tmp/tp_backup/credentials.sh"
 fi
 
 "./verify_credentials.sh"

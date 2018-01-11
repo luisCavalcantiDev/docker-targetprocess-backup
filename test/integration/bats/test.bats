@@ -68,12 +68,38 @@ function clean_func(){
 @test "clean before test" {
   clean_func
 }
-@test "backup works if credentials set" {
+@test "backup works if credentials set with env variables" {
   docker run --name ${cont} -ti \
     --env TEST=true \
     --env TP_DOMAIN="${TP_DOMAIN}" \
     --env TP_USER="${TP_USER}"\
     --env TP_PASSWORD="${TP_PASSWORD}" \
+    -v ${volume_data}:/tmp/tp_backup \
+    "${this_image_name}:${this_image_tag}"
+
+  run docker logs ${cont}
+  assert_equal "$status" 0
+  refute_output --partial "not set, please set it"
+  assert_output --partial "Success, downloaded features of ids: 2700 to 2800 into /tmp/tp_backup/test/test.json"
+
+  run test -f ${volume_data}/test/test.json
+  assert_equal "$status" 0
+
+  run cat ${volume_data}/test/test.json
+  assert_equal "$status" 0
+  assert_output --partial "\"Name\":\"Feature\""
+}
+@test "clean before test" {
+  clean_func
+}
+@test "backup works if credentials set in a file" {
+  echo "#!/bin/bash" > ${volume_data}/credentials.sh
+  echo "export TP_DOMAIN=\"${TP_DOMAIN}\"" >> ${volume_data}/credentials.sh
+  echo "export TP_USER=\"${TP_USER}\"" >> ${volume_data}/credentials.sh
+  echo "export TP_PASSWORD=\"${TP_PASSWORD}\"" >> ${volume_data}/credentials.sh
+
+  docker run --name ${cont} -ti \
+    --env TEST=true \
     -v ${volume_data}:/tmp/tp_backup \
     "${this_image_name}:${this_image_tag}"
 
