@@ -1,9 +1,13 @@
 # targetprocess-backup
 
-Backup TargetProcess entities.
+Docker image to backup [TargetProcess](https://www.targetprocess.com) entities.
 
-## What it does
-This project backups TargetProcess entities like: user stories, features and saves information about them in `.json` files. It also downloads attachments. Uses TargetProcess REST API.
+## Specification
+This project builds a docker image which is responsible for backing up
+ TargetProcess entities like: user stories, features, attachments, etc.
+  The entities are saved into `.json` files, attachments are downloaded.
+
+It uses TargetProcess [REST API](https://md5.tpondemand.com/api/v1/index/meta).
 
 ### Backup directory structure
 Backup will be done into `/tmp/tp_backup/full`.
@@ -32,65 +36,40 @@ For each entity type which is backuped, there is a javascript file in `./entitie
 Dashboards are not backuped. But they are made of views, reports and groups (directories), which are backuped.
 
 ## Usage
-### Without Docker
-#### Environment
-Set up the environment:
+Choose some user who is a TargetProcess Admin and then pass its credentials
+ either as environment variables:
 ```
-$ sudo apt-get install curl
-$ curl -sL https://deb.nodesource.com/setup_0.12 | sudo bash -
-$ sudo apt-get install nodejs npm wget
-```
-Then, clone this repository. In the directory where you cloned this repository, run:
-```
-$ npm install tp-api@1.0.6
+docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup\
+  --env TP_DOMAIN="mydomain.tpondemand.com"\
+  --env TP_USER="TODO" --env TP_PASSWORD="TODO"\
+  xmik/targetprocess-backup
 ```
 
-#### Run
-Run the main backup script, passing the credentials as environment variables. Use some user who is a TargetProcess Admin.:
-```
-$ TP_USER=me TP_DOMAIN=mydomain.tpondemand.com TP_PASSWORD=TODO ./run.sh
-```
-If you don't like passing your credentials as environment variables, you can instead create a local file: `./credentials.sh`, example:
+or write them to a local file: `/tmp/tp_backup/credentials.sh`. E.g.
 ```
 #!/bin/bash
 
 export TP_DOMAIN="mydomain.tpondemand.com"
-export TP_USER="me"
+export TP_USER="TODO"
 export TP_PASSWORD="TODO"
 ```
-and run the script:
+and then run the container:
 ```
-$ ./run.sh
-```
-
-#### Test run
-Instead of running the full backup, you can invoke a bash script which  downloads metadata about some TargetProcess features. Use it in order to test if your environment is correctly set and if you can connect to TargetProcess API.
-```
-$ TP_USER=me TP_DOMAIN=mydomain.tpondemand.com TP_PASSWORD=TODO ./test/test_run.sh
+docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup xmik/targetprocess-backup
 ```
 
-Result will be saved to: `/tmp/tp_backup/test`
-### With Docker
-1. Build the image:
-```
-tp_backup$ docker build -t "targetprocess-backup:$(cat version.txt)" .
-```
-2. Run the image:
-```
-docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup --env TP_DOMAIN="mydomain.tpondemand.com" --env TP_USER="me" --env TP_PASSWORD="TODO" targetprocess-backup:$(cat version.txt)
-```
+This is a short-running image, it will stop after its job is done.
 
-To test the docker image and not run the full backup:
-```
-docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup --env TP_DOMAIN="mydomain.tpondemand.com" --env TP_USER="me" --env TP_PASSWORD="TODO" targetprocess-backup:$(cat version.txt) /opt/tp_backup/test/test_run.sh
-```
+### Usage - test
+If you want to just try this docker image out or verify if you have set up
+ your credentials right and that you can connect to TargetProcess API,
+ run the container
+ with additional environment variable: `-e TEST=true`.
 
-### Output
-Anywhere you see:
-```
-Errors from the request:  null
-```
-that means there were no errors from a REST API request.
+This will only backup some TargetProcess Features (in contrast to backing up
+  all the TargetProcess entities). Result will be saved to: `/tmp/tp_backup/test`.
+  You can choose other TargetProcess entities to experiment on, do it in
+  `./image/backup/run.sh` file.
 
 ### Tar
 To compress the backup:
@@ -98,6 +77,26 @@ To compress the backup:
 $ cd /tmp
 /tmp$ tar -czf tp_backup-$(date +%Y-%m-%d).tar.gz tp_backup/
 ```
+
+## Development
+### Dependencies
+* Bash
+* Docker daemon
+* Bats
+
+### Lifecycle
+1. In a feature branch:
+    * you make changes
+    * you build docker image: `./tasks build`
+    * and test it: `TP_USER=TODO TP_PASSWORD=TODO TP_DOMAIN=TODO ./tasks test`
+1. You decide that your changes are ready and you:
+    * merge into master branch
+    * bump version in CHANGELOG and version file with:
+      * `./tasks set_version` - will bump patch number
+      * or. `./tasks set_version 1.2.3` will set version to 1.2.3
+    * push to master
+1. Automated docker build on hub.docker.com will build and push the image
+
 
 ### Verification
 An easy test is to use the `jq` program, which is downloaded by `run.sh`, so it should be in the current directory after backuping.

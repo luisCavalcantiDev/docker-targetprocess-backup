@@ -36,7 +36,7 @@ case "${command}" in
       docker build -t ${this_image_name}:${this_image_tag} --rm .
       exit $?
       ;;
-  itest)
+  test)
       source "${version_file}"
       echo "Testing image: ${this_image_name}:${this_image_tag}"
       time bats "$(pwd)/test/integration/bats"
@@ -51,8 +51,8 @@ case "${command}" in
         next_version=$(bump_patch_version "${old_version}")
       fi
       set_version_in_changelog "${changelog_file}" "${next_version}"
-      echo "this_image_tag=${next_version}" > ${version_file}
-      echo "this_image_name=xmik/targetprocess-backup" >> ${version_file}
+      echo "export this_image_tag=${next_version}" > ${version_file}
+      echo "export this_image_name=xmik/targetprocess-backup" >> ${version_file}
       echo "Version is set to: ${next_version}"
       exit $?
       ;;

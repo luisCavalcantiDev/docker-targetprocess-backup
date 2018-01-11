@@ -1,7 +1,11 @@
 #!/bin/bash
 set -e
 
-BACKUP_DIR="/tmp/tp_backup/full"
+if [[ -n "${TEST}" ]]; then
+  BACKUP_DIR="/tmp/tp_backup/test"
+else
+  BACKUP_DIR="/tmp/tp_backup/full"
+fi
 
 # http://mywiki.wooledge.org/BashFAQ/028
 # step into the directory with this script in order to use relative
@@ -31,6 +35,15 @@ START_DATE=$(date)
 
 rm -rf $BACKUP_DIR
 mkdir -p $BACKUP_DIR
+
+if [[ -n "${TEST}" ]]; then
+  BACKUP_FILE="${BACKUP_DIR}/test.json"
+  nodejs ./entities/features.js 2700 2800 > $BACKUP_FILE
+  echo "Success, downloaded features of ids: 2700 to 2800 into $BACKUP_FILE"
+  END_DATE=$(date)
+  echo "Done. Started at $START_DATE finished at $END_DATE"
+  exit 0
+fi
 
 # Download metadata about those entities in many requests (each containing less
 # than 1000 items), because there are a lot of those entities objects.

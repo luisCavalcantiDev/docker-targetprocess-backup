@@ -2,6 +2,7 @@
 
 * new directories structure: `image/`
 * added `tasks` file for easier development
+* tests can be run with 1 bash command
 
 ### 0.0.3
 
