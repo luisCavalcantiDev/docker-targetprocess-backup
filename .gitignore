@@ -2,3 +2,4 @@ jq
 node_modules/*
 credentials.sh
 credentials.js
+releaser
