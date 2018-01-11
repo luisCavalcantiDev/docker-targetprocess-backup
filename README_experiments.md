@@ -30,6 +30,11 @@ $ /tmp/tp-experiments/test.sh
 ```
 Those files are intended to be standalone (not dependent on any other files).
 
+Or experiment on the production scripts:
+```
+docker run -ti --volume=$(pwd)/image/backup:/opt/tp_backup xmik/targetprocess-backup /bin/bash
+```
+
 ## Testing resultant files with TargetProcess entities
 Use the `jq` program, which is downloaded by `run.sh`.
 

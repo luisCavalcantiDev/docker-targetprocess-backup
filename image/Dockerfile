@@ -7,6 +7,10 @@ RUN apt-get update &&\
   apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean &&\
   rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 
+RUN wget --tries=3 --retry-connrefused --wait=3 --random-wait --quiet --show-progress --progress=bar:force https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 &&\
+  chmod +x ./jq-linux64 &&\
+  mv ./jq-linux64 /usr/bin/jq
+
 # using `curl -sL https://deb.nodesource.com/setup_9.x | bash -`
 # does not show errors, so let's wget it
 RUN wget -O /tmp/node-setup_9.x https://deb.nodesource.com/setup_9.x &&\
@@ -17,13 +21,14 @@ RUN wget -O /tmp/node-setup_9.x https://deb.nodesource.com/setup_9.x &&\
   apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean &&\
   rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
 
+# Allow using tp-api from any path, for experimenting.
+RUN npm install --global tp-api@1.2.2
+ENV NODE_PATH=/usr/lib/node_modules
+
 COPY ./backup /opt/tp_backup
 COPY version.txt /opt/tp_backup/version.txt
-RUN cd /opt/tp_backup && npm install --global tp-api@1.2.2 &&\
+RUN cd /opt/tp_backup &&\
   chmod +x /opt/tp_backup/*.sh
-
-# in order to allow using tp-api from any path, for experimenting
-ENV NODE_PATH=/usr/lib/node_modules
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["/opt/tp_backup/run.sh"]

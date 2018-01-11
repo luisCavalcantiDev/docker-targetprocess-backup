@@ -56,6 +56,7 @@ docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup\
 Choose some user who is a TargetProcess Admin and then write its credentials
 to a local file which will be accessible in the docker container as: `/tmp/tp_backup/credentials.sh`. E.g.
 ```
+$ cat /tmp/tp_backup/credentials.sh
 #!/bin/bash
 
 export TP_DOMAIN="mydomain.tpondemand.com"

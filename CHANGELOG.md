@@ -8,6 +8,8 @@
    * tp-api=1.2.2
    * debian:stretch-slim
 * make it easier to experiment with: install tp-api globally
+* fix downloading attachments #1 (there is no more Uri field when getting
+  attachments through TargetProcess REST API)
 
 ### 0.0.3
 

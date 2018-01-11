@@ -1,0 +1,8 @@
+[
+  {"ResourceType":"Attachment","Id":1,"Name":"name1",
+    "Description":null,"Date":"/Date(1411379118000-0500)/"},
+  {"ResourceType":"Attachment","Id":2,"Name":"name2",
+    "Description":null,"Date":"/Date(1411379120000-0500)/"},
+  {"ResourceType":"Attachment","Id":22,"Name":"sth.txt",
+    "Description":null,"Date":"/Date(1411379120000-0500)/"}
+]
