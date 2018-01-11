@@ -2,7 +2,7 @@
 
 var tp = require('tp-api')({
            domain:   'mydomain.tpondemand.com',
-           username: 'me',
+           username: 'TODO',
            password: 'TODO'
          })
 

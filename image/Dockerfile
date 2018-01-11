@@ -19,8 +19,11 @@ RUN wget -O /tmp/node-setup_9.x https://deb.nodesource.com/setup_9.x &&\
 
 COPY ./backup /opt/tp_backup
 COPY version.txt /opt/tp_backup/version.txt
-RUN cd /opt/tp_backup && npm install tp-api@1.2.2 &&\
+RUN cd /opt/tp_backup && npm install --global tp-api@1.2.2 &&\
   chmod +x /opt/tp_backup/*.sh
+
+# in order to allow using tp-api from any path, for experimenting
+ENV NODE_PATH=/usr/lib/node_modules
 
 ENTRYPOINT ["/bin/bash", "-c"]
 CMD ["/opt/tp_backup/run.sh"]

@@ -7,6 +7,7 @@
    * nodejs=9.4.0-1nodesource1
    * tp-api=1.2.2
    * debian:stretch-slim
+* make it easier to experiment with: install tp-api globally
 
 ### 0.0.3
 

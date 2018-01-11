@@ -3,7 +3,7 @@
 # Experiment with curl and TargetProcess REST API
 
 TP_DOMAIN="mydomain.tpondemand.com"
-TP_USER="me"
+TP_USER="TODO"
 TP_PASSWORD="TODO"
 
 # get 1 user story with specified ID

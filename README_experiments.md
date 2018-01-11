@@ -1,3 +1,80 @@
+# Experiments
+*Notes from experimenting with TargetProcess API and tp-api npm package*
+
+## How to use unreleased `tp-api` version?
+If you want to use unreleased `tp-api` version, instead of
+```
+$ npm install tp-api
+```
+run:
+```
+$ mkdir -p node_modules/ && cd node_modules/
+$ git clone https://github.com/8bitDesigner/tp-api.git && cd tp-api/
+$ npm install
+```
+
+## How to start experimenting?
+Run interactively in `xmik/targetprocess-backup` docker container, so that
+ you have environment set up:
+```
+docker run -ti --volume=$(pwd)/test/experiments:/tmp/tp-experiments xmik/targetprocess-backup /bin/bash
+```
+
+Use the file `test.js` to experiment using `tp-api`:
+```
+$ nodejs /tmp/tp-experiments/test.js
+```
+or the file `test.sh` to experiment using `curl`:
+```
+$ /tmp/tp-experiments/test.sh
+```
+Those files are intended to be standalone (not dependent on any other files).
+
+## Testing resultant files with TargetProcess entities
+Use the `jq` program, which is downloaded by `run.sh`.
+
+To get all the IDs of some entity objects in a file:
+```
+$ cat /tmp/tp_backup/full/features_2704_3604.json | ./jq '.[].Id'
+```
+To get names:
+```
+$ cat /tmp/tp_backup/full/features_6308_7208.json | ./jq '.[].Name'
+```
+
+## How to backup only Features?
+Each entity type that will be backuped has its own file in `./entities` directory, e.g.: `./entities/features.js`. That file takes 2 command line parameters: the start ID and the end ID. They specify a range (inclusive) in which we look for entity objects. Each of those files in `./entities` directory can be invoked separately. For example, to backup features of IDs from 100 to 150, run:
+```
+$ nodejs entities/features.js 100 150
+```
+In order to redirect the stdout to a file:
+```
+$ nodejs entities/features.js 100 150 > /tmp/tp_features_100_to_150.json
+```
+There is still stderr, which if all goes fine shows:
+```
+Errors from the request:  null
+```
+Some of those files do not take parameters, because there are so few of such entities objects (e.g. we have 2 Roles) and we backup them all at once.
+
+## TP API ranges
+As written on [dev.targetprocess.com](http://dev.targetprocess.com/rest/response_format): "You can not have more then 1000 items per request. If you set 'take' parameter greater than 1000, it will be treated as 1000 (including link generation)". Also, despite of Features, Tasks, UserStories and similar entities sharing the same Id assignments, the entities like e.g.: Assignments has its own Ids assignments (there can be Feature with Id = 3 and Assignment with Id = 3), so to make the number even (not to backup 999 entities objects at once) and to be more safe, we backup up to 900, not 1000 entities in 1 request.
+
+In order not to make the main script too complicated, I use those ranges for all entities for which I can. Each request response is saved to one file.
+
+By default, a request takes 25 entities objects.
+
+## Why the `.append()` method?
+In order to make the backup restore, in the future, easier, I decided to get additional fields for some enitities objects. Example: `Bugs-Count` or `Comments-Count`. So that we can perform some verification that we matched e.g. all the Bugs for a UserStory.
+
+## Attachments
+There is some trouble around getting Attachments (#7537 and [this open bug](https://tp3.uservoice.com/forums/174654-we-will-rock-you/suggestions/6312209-improve-rest-api-support-operations-for-attachmen)), in result we can:
+  * get metadata about 1 attachment at a time using curl
+  * get metadata about all attachments at a time using curl
+  * get metadata about all attachments at a time using `tp-api`
+
+Since we have less than 60 attachments (28th October 2015), it is ok to get metadata about them all at once. I don't think this will change. Each of them is downloaded separately anyway.
+
 ## TP API knowledge base
 How to construct TP REST API requests using NodeJS library: [`tp-api`](https://github.com/8bitDesigner/tp-api) (written in JavaScript) and plain `curl`. With example outputs.
 
@@ -12,14 +89,14 @@ Public sources:
 For `curl` set:
 ```bash
 TP_DOMAIN="mydomain.tpondemand.com"
-TP_USER="me"
+TP_USER="TODO"
 TP_PASSWORD="TODO"
 ```
 For `tp-api`:
 ```javascript
 var tp = require('tp-api')({
            domain:   'mydomain.tpondemand.com',
-           username: 'me',
+           username: 'TODO',
            password: 'TODO'
          })
 ```
