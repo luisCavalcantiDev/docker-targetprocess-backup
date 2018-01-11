@@ -3,6 +3,10 @@
 * new directories structure: `image/`
 * added `tasks` file for easier development
 * tests can be run with 1 bash command
+* update dependencies:
+   * nodejs=9.4.0-1nodesource1
+   * tp-api=1.2.2
+   * debian:stretch-slim
 
 ### 0.0.3
 
