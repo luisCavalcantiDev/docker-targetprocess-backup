@@ -10,6 +10,7 @@
 * make it easier to experiment with: install tp-api globally
 * fix downloading attachments #1 (there is no more Uri field when getting
   attachments through TargetProcess REST API)
+* renamed git repo to docker-targetprocess-backup
 
 ### 0.0.3
 

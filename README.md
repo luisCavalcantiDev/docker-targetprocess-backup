@@ -1,4 +1,4 @@
-# targetprocess-backup
+# docker-targetprocess-backup
 
 Docker image to backup [TargetProcess](https://www.targetprocess.com) entities.
 
