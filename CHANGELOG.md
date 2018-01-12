@@ -1,6 +1,9 @@
 ### 1.0.1 (2018-Jan-12)
 
 * add option: UPPER_ID to set the highest expected Id of a TargetProcess entity, defaults to 16000 #2
+* do not print `Errors from the request: null` after each request, print error
+ only if it was truthy #3
+* catch more errors from http requests
 
 ### 1.0.0 (2018-Jan-11)
 
