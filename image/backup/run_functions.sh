@@ -6,6 +6,7 @@ if [[ -n "${TEST}" ]]; then
 else
   BACKUP_DIR="${1:-/tmp/tp_backup/full}"
 fi
+UPPER_ID="${1:-16000}"
 CREDENTIALS_FILE="$(readlink -m ${BACKUP_DIR}/../credentials.sh)"
 
 # http://mywiki.wooledge.org/BashFAQ/028
@@ -53,59 +54,62 @@ function verify_credentials() {
 
 function backup_to_json() {
   echo "Backing up all the entities"
-  if [[ -n "${TEST}" ]]; then
-    BACKUP_FILE="${BACKUP_DIR}/test.json"
-    nodejs ./entities/features.js 2700 2800 > $BACKUP_FILE
-    echo "Success, downloaded features of ids: 2700 to 2800 into $BACKUP_FILE"
-  else
-    # Download metadata about those entities in many requests (each containing less
-    # than 1000 items), because there are a lot of those entities objects.
-    declare -a ENTITIES=("assignments" "bugs" "builds" "comments" "epics" \
-      "features" "impediments" "iterations" "relations" "releases" "requests" \
-      "tasks" "team_iterations" "times" "user_stories")
+  # Download metadata about those entities in many requests (each containing less
+  # than 1000 items), because there are a lot of those entities objects.
+  declare -a ENTITIES=("assignments" "bugs" "builds" "comments" "epics" \
+    "features" "impediments" "iterations" "relations" "releases" "requests" \
+    "tasks" "team_iterations" "times" "user_stories")
 
-    ID_RANGE_START='1'
-    ID_RANGE_INCREMENT='900' # the first file contains assignments from 1 to 900
+  ID_RANGE_START='1'
+  ID_RANGE_INCREMENT='900' # the first file contains entities from 1 to 900
 
-    # loop through the above array with ENTITIES
-    for e in "${ENTITIES[@]}"
-    do
-      ENTITY="$e"
-      echo "Backuping $ENTITY"
-      # loop through the above array with ID_RANGES_STARTS
-      while [ $ID_RANGE_START -le '11000' ] ; do
-        CURRENT_RANGE_START=$ID_RANGE_START
-        # here we add $ID_RANGE_INCREMENT to $CURRENT_RANGE_START
-        CURRENT_RANGE_END=$(($CURRENT_RANGE_START + $ID_RANGE_INCREMENT))
-        BACKUP_FILE="${BACKUP_DIR}/${ENTITY}_${CURRENT_RANGE_START}_${CURRENT_RANGE_END}.json"
-        echo "Backuping $ENTITY from: $CURRENT_RANGE_START to: $CURRENT_RANGE_END into $BACKUP_FILE"
-        # comment the line below for dry run
+  # loop through the above array with ENTITIES
+  for e in "${ENTITIES[@]}"
+  do
+    ENTITY="$e"
+    echo "Backing up $ENTITY"
+    # loop through the above array with ID_RANGES_STARTS
+    while [ $ID_RANGE_START -le "${UPPER_ID}" ] ; do
+      CURRENT_RANGE_START=$ID_RANGE_START
+      # here we add $ID_RANGE_INCREMENT to $CURRENT_RANGE_START
+      CURRENT_RANGE_END=$(($CURRENT_RANGE_START + $ID_RANGE_INCREMENT))
+      BACKUP_FILE="${BACKUP_DIR}/${ENTITY}_${CURRENT_RANGE_START}_${CURRENT_RANGE_END}.json"
+      echo "Backing up $ENTITY from Id: $CURRENT_RANGE_START to: $CURRENT_RANGE_END into $BACKUP_FILE"
+      if [[ -n "${TEST}" ]]; then
+        touch ${BACKUP_FILE}
+      else
         nodejs entities/$ENTITY.js ${CURRENT_RANGE_START} ${CURRENT_RANGE_END} > ${BACKUP_FILE}
-        ID_RANGE_START=$(($CURRENT_RANGE_END + 1))
-      done
-      ID_RANGE_START='1'
+      fi
+      ID_RANGE_START=$(($CURRENT_RANGE_END + 1))
     done
+    ID_RANGE_START='1'
+  done
 
-    # Download metadata about those entities all at once (e.g. all roles at once),
-    # because there are very few of them and should never grow.
-    # Only <60 attachments (27th October 2015)
-    declare -a SMALL_ENTITIES=("attachments" "context" "custom_rules" "processes" \
-      "programs" "projects" "roles" "teams" "team_projects" "workflows")
+  # Download metadata about those entities in 1 request (e.g. all roles at once),
+  # because there are very few of them and should never grow.
+  # Only <60 attachments (27th October 2015)
+  declare -a SMALL_ENTITIES=("attachments" "context" "custom_rules" "processes" \
+    "programs" "projects" "roles" "teams" "team_projects" "workflows")
 
-    # loop through the above array with SMALL_ENTITIES
-    for e in "${SMALL_ENTITIES[@]}"
-    do
-      SMALL_ENTITY="$e"
-      BACKUP_FILE="${BACKUP_DIR}/${SMALL_ENTITY}.json"
-      echo "Backuping $SMALL_ENTITY into $BACKUP_FILE"
-      # comment the line below for dry run
-      nodejs entities/$SMALL_ENTITY.js > ${BACKUP_FILE}
-    done
+  # loop through the above array with SMALL_ENTITIES
+  for e in "${SMALL_ENTITIES[@]}"
+  do
+    SMALL_ENTITY="$e"
+    BACKUP_FILE="${BACKUP_DIR}/${SMALL_ENTITY}.json"
+    echo "Backing up: ${SMALL_ENTITY} into ${BACKUP_FILE}"
+    if [[ -n "${TEST}" ]]; then
+      touch ${BACKUP_FILE}
+    else
+      nodejs entities/${SMALL_ENTITY}.js > ${BACKUP_FILE}
+    fi
+  done
 
-    VIEWS_BACKUP_FILE="$BACKUP_DIR/views.json"
-    echo "Backuping up views into $VIEWS_BACKUP_FILE"
-    # comment the line below for dry run
-    curl -X GET -u $TP_USER:$TP_PASSWORD "https://$TP_DOMAIN/api/views/v1/?take=1000&format=json" > ${VIEWS_BACKUP_FILE}
+  VIEWS_BACKUP_FILE="${BACKUP_DIR}/views.json"
+  echo "Backing up views into ${VIEWS_BACKUP_FILE}"
+  if [[ -n "${TEST}" ]]; then
+    touch ${VIEWS_BACKUP_FILE}
+  else
+    curl -X GET -u $TP_USER:$TP_PASSWORD "https://${TP_DOMAIN}/api/views/v1/?take=1000&format=json" > ${VIEWS_BACKUP_FILE}
   fi
 }
 

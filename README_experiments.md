@@ -90,22 +90,6 @@ Public sources:
 * while https://md5.tpondemand.com/api/v1/UserStories/ says what can be requested from a UserStory, this link: https://md5.tpondemand.com/api/v1/UserStories/ provides an example XML response. Same for other entities. The response contains: `Values` (e.g. Name, Description, Tags), `Resource reference`s and from `Resource collections` only CustomFields.
 * https://github.com/8bitDesigner/tp-api
 
-### Set credentials
-For `curl` set:
-```bash
-TP_DOMAIN="mydomain.tpondemand.com"
-TP_USER="TODO"
-TP_PASSWORD="TODO"
-```
-For `tp-api`:
-```javascript
-var tp = require('tp-api')({
-           domain:   'mydomain.tpondemand.com',
-           username: 'TODO',
-           password: 'TODO'
-         })
-```
-
 ### General problems
 
 1. Curl:

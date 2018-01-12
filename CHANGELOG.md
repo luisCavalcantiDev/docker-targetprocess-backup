@@ -1,3 +1,7 @@
+### 1.0.1 (2018-Jan-12)
+
+* add option: UPPER_ID to set the highest expected Id of a TargetProcess entity, defaults to 16000 #2
+
 ### 1.0.0 (2018-Jan-11)
 
 * new directories structure: `image/`

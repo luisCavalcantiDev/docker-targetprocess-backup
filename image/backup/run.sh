@@ -23,6 +23,7 @@ source ./run_functions.sh
 
 echo "TargetProcess-backup: Started"
 echo "TargetProcess-backup: BACKUP_DIR set to: ${BACKUP_DIR}"
+echo "TargetProcess-backup: UPPER_ID set to: ${UPPER_ID}"
 
 if [[ "${DO_NOT_REMOVE_BACKUP_DIR}" != "true" ]]; then
   rm -rf $BACKUP_DIR

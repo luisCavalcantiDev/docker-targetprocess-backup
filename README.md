@@ -29,11 +29,17 @@ Backup files will be save into directory `/tmp/tp_backup/full`.
   context.json
   ...
 ```
-The entities objects are sorted in descending order (except for Attachments for which that option does not work and there is a [public issue](https://tp3.uservoice.com/forums/174654-we-will-rock-you/suggestions/6312209-improve-rest-api-support-operations-for-attachmen) for that).
+The entities objects are sorted in descending order (except for Attachments for which that option does not work and there is a [public issue](https://tp3.uservoice.com/forums/174654-we-will-rock-you/suggestions/6312209-improve-rest-api-support-operations-for-attachment) for that).
 For each entity type which is backuped, there is a javascript file in `./entities` directory. Additionally: all the views are backuped using `curl`.
 
 ### The entities not backuped
 Dashboards are not backuped. But they are made of views, reports and groups (directories), which are backuped.
+
+### Warning
+The scripts here are opinionated (e.g. we assume many UserStory entities and
+ little Attachments entities, thus we backup UserStory entities in many http requests
+ and Attachments entities in 1 http request). Thus, you may prefer to fork this
+ project instead of using it as is.
 
 ## Usage
 This is a short-running image, it will stop after its job is done.
@@ -67,6 +73,11 @@ and then run the container:
 ```
 docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup xmik/targetprocess-backup
 ```
+
+### Configuration
+You should set:
+   * UPPER_ID which is the highest expected Id of a TargetProcess entity, defaults to 16000
+
 
 ### Usage - test
 If you want to just try this docker image out or verify if you have set up
