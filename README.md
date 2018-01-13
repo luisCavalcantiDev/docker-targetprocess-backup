@@ -75,9 +75,10 @@ docker run -ti --volume=/tmp/tp_backup:/tmp/tp_backup xmik/targetprocess-backup
 ```
 
 ### Configuration
-You should set:
+You can set:
    * UPPER_ID which is the highest expected Id of a TargetProcess entity, defaults to 16000
-
+   * BACKUP_DIR which defaults to `/tmp/tp_backup/full` or `/tmp/tp_backup/test`
+    when TEST=true is set
 
 ### Usage - test
 If you want to just try this docker image out or verify if you have set up

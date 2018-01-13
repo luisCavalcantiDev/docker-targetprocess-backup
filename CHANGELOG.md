@@ -1,3 +1,8 @@
+### 1.0.2 (2018-Jan-13)
+
+* UPPER_ID needed to be set as argument to `run.sh` script, now it can be just
+ set among other environment variables
+
 ### 1.0.1 (2018-Jan-12)
 
 * add option: UPPER_ID to set the highest expected Id of a TargetProcess entity, defaults to 16000 #2

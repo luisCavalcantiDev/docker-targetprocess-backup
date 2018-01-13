@@ -2,11 +2,11 @@
 set -e
 
 if [[ -n "${TEST}" ]]; then
-  BACKUP_DIR="${1:-/tmp/tp_backup/test}"
+  BACKUP_DIR="${BACKUP_DIR:-/tmp/tp_backup/test}"
 else
-  BACKUP_DIR="${1:-/tmp/tp_backup/full}"
+  BACKUP_DIR="${BACKUP_DIR:-/tmp/tp_backup/full}"
 fi
-UPPER_ID="${1:-16000}"
+UPPER_ID="${UPPER_ID:-16000}"
 CREDENTIALS_FILE="$(readlink -m ${BACKUP_DIR}/../credentials.sh)"
 
 # http://mywiki.wooledge.org/BashFAQ/028

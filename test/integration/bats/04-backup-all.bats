@@ -9,6 +9,7 @@ load 'variables'
 @test "backup works with credentials set as environment variables" {
   run docker run --name ${cont} -ti \
     --env TEST=true \
+    --env UPPER_ID=4000 \
     --env DO_NOT_REMOVE_BACKUP_DIR=true \
     --env TP_DOMAIN="${TP_DOMAIN}" \
     --env TP_USER="${TP_USER}" \
@@ -19,6 +20,8 @@ load 'variables'
   assert_output --partial "TargetProcess-backup: Success"
   assert_output --partial "Backing up all the entities"
   assert_output --partial "Will download 3 attachments into"
+  assert_output --partial "BACKUP_DIR set to: /tmp/tp_backup/test"
+  assert_output --partial "UPPER_ID set to: 4000"
   assert_equal "$status" 0
 
   run test -f ${volume_data}/test/attachments/sth.txt
@@ -47,6 +50,8 @@ load 'variables'
   assert_output --partial "TargetProcess-backup: Success"
   assert_output --partial "Backing up all the entities"
   assert_output --partial "Will download 3 attachments into"
+  assert_output --partial "BACKUP_DIR set to: /tmp/tp_backup/test"
+  assert_output --partial "UPPER_ID set to: 16000"
   assert_equal "$status" 0
 
   run test -f ${volume_data}/test/attachments/sth.txt
