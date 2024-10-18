@@ -1,34 +1,35 @@
-FROM debian:stretch-slim
-LABEL maintainer="ewa@ai-traders.com"
+FROM debian:bullseye-slim
 
-RUN apt-get update &&\
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends\
-  curl gnupg2 wget nano ca-certificates &&\
-  apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean &&\
-  rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
+# Set maintainer (optional)
+# LABEL maintainer="ewa@ai-traders.com"
 
-RUN wget --tries=3 --retry-connrefused --wait=3 --random-wait --quiet --show-progress --progress=bar:force https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 &&\
-  chmod +x ./jq-linux64 &&\
-  mv ./jq-linux64 /usr/bin/jq
+# Install core dependencies
+RUN apt-get update && \
+    apt-get install -y --no-install-recommends \
+    curl gnupg2 wget nano ca-certificates lsb-release && \
+    apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# using `curl -sL https://deb.nodesource.com/setup_9.x | bash -`
-# does not show errors, so let's wget it
-RUN wget -O /tmp/node-setup_9.x https://deb.nodesource.com/setup_9.x &&\
-  chmod +x /tmp/node-setup_9.x &&\
-  /tmp/node-setup_9.x &&\
-  DEBIAN_FRONTEND=noninteractive apt-get install -y --no-install-recommends\
-  nodejs=9.4.0-1nodesource1 &&\
-  apt-get -y autoremove && apt-get -y autoclean && apt-get -y clean &&\
-  rm -rf /tmp/* /var/tmp/* && rm -rf /var/lib/apt/lists/*
+# Install jq from GitHub
+RUN wget --tries=3 --retry-connrefused --wait=3 --random-wait \
+    https://github.com/stedolan/jq/releases/download/jq-1.5/jq-linux64 -O /usr/bin/jq && \
+    chmod +x /usr/bin/jq
 
-# Allow using tp-api from any path, for experimenting.
+# Install Node.js 18.x from Nodesource
+RUN curl -fsSL https://deb.nodesource.com/setup_18.x | bash - && \
+    apt-get install -y --no-install-recommends nodejs && \
+    apt-get clean && rm -rf /var/lib/apt/lists/* /tmp/*
+
+# Install tp-api globally
 RUN npm install --global tp-api@1.2.2
 ENV NODE_PATH=/usr/lib/node_modules
 
+# Copy backup scripts and version file
 COPY ./backup /opt/tp_backup
 COPY version.txt /opt/tp_backup/version.txt
-RUN cd /opt/tp_backup &&\
-  chmod +x /opt/tp_backup/*.sh
 
-ENTRYPOINT ["/bin/bash", "-c"]
+# Make sure scripts are executable
+RUN chmod +x /opt/tp_backup/*.sh
+
+# Set entry point and default command
+ENTRYPOINT ["/bin/bash"]
 CMD ["/opt/tp_backup/run.sh"]
